@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/anchor-is-valid */ // next/link passes href
 
 import { Popover, Transition } from "@headlessui/react"; // TailwindUI
@@ -5,6 +7,7 @@ import Link from "next/link"; // Dynamic routing
 import { Fragment } from "react"; // State management, Fragment for TailwindUI
 import web3 from "@/app/web3"; // Global State
 import Wallet from "./Wallet";
+import { useThemeUpdate } from "@/hooks/useDarkMode";
 
 const learn = [
   {
@@ -59,6 +62,7 @@ function classNames(...classes) {
 
 const Navbar = (): JSX.Element => {
   const { address } = web3.useContainer(); // Global state
+  const toggleTheme = useThemeUpdate();
 
   return (
     <div id="navContainer">
@@ -95,6 +99,7 @@ const Navbar = (): JSX.Element => {
                   >
                     {/* About */} CAUTION - RINKEBY TESTNET ONLY!
                   </a>
+                  <div onClick={() => toggleTheme}>toggle</div>
                   {/* <div className="-my-2 -mr-2 md:hidden">
                     <Popover.Button className="inline-flex justify-center items-center p-2 bg-white text-dark-secondary hover:text-dark-secondary hover:bg-dark-background focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-500">
                       <span className="sr-only">Open menu</span>

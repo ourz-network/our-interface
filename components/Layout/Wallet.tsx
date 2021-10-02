@@ -2,6 +2,7 @@
 import Link from "next/link"; // Dynamic routing
 import { useEffect, useState, Fragment } from "react"; // State management, Fragment for TailwindUI
 import { Popover, Transition } from "@headlessui/react"; // TailwindUI
+import { useActiveWeb3React } from "@/hooks/web3";
 import web3 from "@/app/web3"; // Global state
 import { checkForProfile } from "@/modules/mongodb/utils/functions";
 import Button from "@/components/Button";
@@ -11,6 +12,9 @@ function classNames(...classes) {
 }
 
 const Wallet = (): JSX.Element => {
+  const { account, chainId, library, connector, deactivate } = useActiveWeb3React();
+  console.log(`account: `, account);
+  console.log(`chainId: `, chainId);
   const { address, network, authenticate, disconnectWeb3 } = web3.useContainer();
 
   const [signerProfile, setSignerProfile] = useState(); // Check for user on Ourz' user profile api.
