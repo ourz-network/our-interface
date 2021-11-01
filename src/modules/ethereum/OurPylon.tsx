@@ -526,10 +526,17 @@ export const createZoraAuction = async ({
   const proxyPylon = initializeOurProxyAsPylonWSigner({ proxyAddress, signer });
 
   const ReservePrice: BigNumberish = ethers.utils.parseUnits(reservePrice.toString(), "ether");
+  const Duration = 60 * 60 * duration;
+  // console.log(
+  //   `${Duration} seconds // ${Duration / 60} minutes // ${Duration / 60 / 60} Hours // ${
+  //     Duration / 60 / 60 / 24
+  //   } Days`
+  // );
+
   const auctionTx = await proxyPylon.createZoraAuction(
     tokenId,
     tokenContract,
-    duration,
+    Duration,
     ReservePrice,
     curator || proxyAddress,
     curatorFeePercentage || Number(0),

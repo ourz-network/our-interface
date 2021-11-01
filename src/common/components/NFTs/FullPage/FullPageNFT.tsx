@@ -13,6 +13,7 @@ import Royalties from "./Royalties";
 import Table from "@/components/Charts/Table";
 import ShareNFTE from "./ShareNFTE";
 import useEditions from "@/common/hooks/useEditions";
+import ManageUnique from "./ManageUnique";
 
 interface SaleInfo {
   maxSupply: number;
@@ -87,6 +88,7 @@ const FullPageNFT = ({
                 </div>
               </div>
               <div className="flex flex-col space-y-2 xl:mt-0 xl:w-5/12 xl:ml-6">
+                {isOwner && <ManageUnique />}
                 <FullComponents.CreatorEquity />
                 <FullComponents.BidHistory />
                 {recipients?.length > 1 && <Table recipients={recipients} />}

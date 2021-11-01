@@ -1,10 +1,8 @@
 import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { useAuctions } from "@zoralabs/nft-hooks";
 import web3 from "@/app/web3";
 import ActionDialog from "@/components/Dashboard/ActionDialog";
 import AuctionForm from "@/components/Dashboard/AuctionForm";
-import NFTPreviewCard from "@/common/components/NFTs/Preview/NFTPreviewCard";
 import { Split, Recipient } from "@/utils/OurzSubgraph";
 import Sidebar from "./Sidebar";
 import { NFTCard } from "@/modules/subgraphs/utils";
@@ -35,7 +33,6 @@ const SplitFull = ({
 
   const refDiv = useRef(null);
 
-  // const { data } = useAuctions(split.id);
   // const startAnAuction = (tokenId) => {
   //   setSelectedId(tokenId);
   //   setDialog("auction");
@@ -95,26 +92,6 @@ const SplitFull = ({
               No Creations
             </h1>
           )}
-
-          {/* {data &&
-            data
-              .filter(
-                (auction) =>
-                  parseInt(auction.expectedEndTimestamp, 10) >= new Date().getTime() / 1000
-              )
-              .map((auction) => (
-                <React.Fragment key={auction.id}>
-                  <NFTPreviewCard
-                    key={auction.id}
-                    tokenId={auction.tokenId as string}
-                    onClick={() =>
-                      Router.push(`/nft/${auction.tokenContract}/${auction.tokenId as string}`)
-                    }
-                    split={split}
-                    isCreation={false}
-                  />
-                </React.Fragment>
-              ))} */}
         </div>
       </div>
     </div>
