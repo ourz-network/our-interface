@@ -7,6 +7,7 @@ import {
 import { Split, Recipient } from "@/utils/OurzSubgraph";
 import { getPostByID } from "@/modules/subgraphs/zora/functions";
 import { claimFunds } from "@/modules/ethereum/OurPylon";
+import { NFTCard } from "@/modules/subgraphs/utils";
 
 const useSplits = ({ address }: { address: string | undefined }) => {
   // all user's splits

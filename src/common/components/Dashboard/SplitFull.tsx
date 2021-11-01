@@ -29,13 +29,13 @@ const SplitFull = ({
 }): JSX.Element => {
   const Router = useRouter();
   const { signer, address } = web3.useContainer();
-  const { data } = useAuctions(split.id);
   const [dialog, setDialog] = useState<string | undefined>();
   const [showDialog, setShowDialog] = useState<boolean | undefined>();
   const [selectedId, setSelectedId] = useState<number | undefined>();
 
   const refDiv = useRef(null);
 
+  // const { data } = useAuctions(split.id);
   // const startAnAuction = (tokenId) => {
   //   setSelectedId(tokenId);
   //   setDialog("auction");
@@ -96,7 +96,7 @@ const SplitFull = ({
             </h1>
           )}
 
-          {data &&
+          {/* {data &&
             data
               .filter(
                 (auction) =>
@@ -114,7 +114,7 @@ const SplitFull = ({
                     isCreation={false}
                   />
                 </React.Fragment>
-              ))}
+              ))} */}
         </div>
       </div>
     </div>

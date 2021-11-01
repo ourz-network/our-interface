@@ -23,7 +23,7 @@ const UserDashboard = (): JSX.Element => {
 
   const [showFull, setShowFull] = useState(false);
 
-  const handleClickThumbnail = (split: OurProxy) => {
+  const handleClickThumbnail = (split: Split) => {
     setSelectedSplit(split);
     setShowFull(true);
   };
@@ -53,12 +53,12 @@ const UserDashboard = (): JSX.Element => {
                     Splits you are a Whitelisted Minter for:
                   </h1>
                   <div className="grid auto-cols-auto auto-rows-auto gap-8 justify-center mx-auto mt-2 h-full min-w-screen">
-                    {ownedSplits.map((ourProxy) => (
+                    {ownedSplits.map((split) => (
                       <SplitThumb
-                        key={`own-${ourProxy.id}`}
-                        ownedSplit={ourProxy}
+                        key={`own-${split.id}`}
+                        ownedSplit={split}
                         userInfo={userSplitInfo}
-                        handleClick={() => handleClickThumbnail(ourProxy, true)}
+                        handleClick={() => handleClickThumbnail(split)}
                       />
                     ))}
                   </div>
@@ -76,12 +76,12 @@ const UserDashboard = (): JSX.Element => {
                     Splits you are able to claim:
                   </h1>
                   <div className="grid auto-cols-auto auto-rows-min gap-8 justify-center mx-auto mt-2 w-full h-full">
-                    {claimableSplits.map((ourProxy) => (
+                    {claimableSplits.map((recipient) => (
                       <SplitThumb
-                        key={`rec-${ourProxy.id}`}
-                        claimableSplit={ourProxy}
+                        key={`rec-${recipient.id}`}
+                        claimableSplit={recipient}
                         userInfo={userSplitInfo}
-                        handleClick={() => handleClickThumbnail(ourProxy.splitProxy, false)}
+                        handleClick={() => handleClickThumbnail(recipient.split)}
                       />
                     ))}
                   </div>
