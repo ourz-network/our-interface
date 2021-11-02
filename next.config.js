@@ -37,6 +37,7 @@ const nextConfig = {
       "images.mirror-media.xyz",
       "media.giphy.com",
       "zora-dev.mypinata.cloud",
+      "infura-ipfs.io",
     ],
     path: "/_next/image",
     // loader can be 'default', 'imgix', 'cloudinary', 'akamai', or 'custom'
