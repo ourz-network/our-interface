@@ -21,7 +21,7 @@ const Wallet = (): JSX.Element => {
   useEffect(() => {
     async function getSignerProfile(signerAddress: string) {
       const profile = await checkForProfile({ web3Address: signerAddress });
-      if (profile) {
+      if (profile !== signerProfile) {
         setSignerProfile(profile);
       }
     }

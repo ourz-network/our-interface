@@ -1,16 +1,43 @@
 /* eslint-disable no-console */
-import { useState } from "react";
-import { Signer } from "ethers";
-import { createZoraAuction } from "@/modules/ethereum/OurPylon";
+import { useEffect, useState } from "react";
+import { ethers, Signer } from "ethers";
+import { Auction, AuctionHouse } from "@zoralabs/zdk";
+import { createZoraAuction, placeBidZoraAH } from "@/modules/ethereum/OurPylon";
 import { NFTCard } from "@/modules/subgraphs/utils";
 
-interface SaleInfo {
-  maxSupply: number;
-  currentSupply: number;
-  salePrice: number;
-}
-
 const useUniques = ({ post, signer }: { post: NFTCard; signer: Signer | undefined }) => {
+  const [auctionInfo, setAuctionInfo] = useState<Auction | undefined>(undefined);
+  const [bid, setBid] = useState(0);
+  const [minBid, setMinBid] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    async function getAuctionInfo() {
+      const auctionHouse = new AuctionHouse(signer, 1);
+      const auction = await auctionHouse.fetchAuction(post.auctionId);
+      if (ethers.utils.formatEther(auction.amount.toString()) === "0.0") {
+        setMinBid(Number(ethers.utils.formatEther(auction.reservePrice)));
+        setBid(Number(ethers.utils.formatEther(auction.reservePrice)));
+      } else {
+        setMinBid(Number(ethers.utils.formatEther(auction.amount)) * 1.05);
+        setBid(Number(ethers.utils.formatEther(auction.amount)) * 1.05);
+      }
+      console.log(auction);
+      console.log(minBid);
+      setAuctionInfo(auction);
+    }
+
+    if (post.auctionId && signer) {
+      getAuctionInfo().then(
+        () => {},
+        () => {}
+      );
+    }
+  }, [post?.auctionId, signer]);
+
+  const placeBid = async () => {
+    const success = await placeBidZoraAH({ signer, auctionId: post.auctionId, bidAmount: bid });
+  };
+
   const [formData, setFormData] = useState({
     signer,
     proxyAddress: post?.creator,
@@ -46,6 +73,11 @@ const useUniques = ({ post, signer }: { post: NFTCard; signer: Signer | undefine
     formData,
     handleChange,
     startAuction,
+    auctionInfo,
+    bid,
+    setBid,
+    minBid,
+    placeBid,
   };
 };
 

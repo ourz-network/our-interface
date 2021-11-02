@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { ethers } from "ethers";
 import { Ourz20210928 } from "@/utils/20210928";
 import { SplitEdition } from "@/utils/OurzSubgraph";
-import { Media } from "@/utils/ZoraSubgraph";
+import { Media, ReserveAuction } from "@/utils/ZoraSubgraph";
 
 export interface NFTCard {
   nftKind: "Edition" | "1/1";
@@ -17,6 +17,7 @@ export interface NFTCard {
   mimeType: string;
   contentURI: string;
   royalty: string;
+  auctionId?: number;
 }
 
 const reverseRegex = /https:\/\/(?<IPFShash>\w+).ipfs.dweb.link/g;
@@ -100,6 +101,7 @@ export const formatUniquePost = async (nft: Media | null): Promise<NFTCard | nul
     mimeType: metadata.mimeType,
     contentURI: cleanURLs[0],
     royalty: ethers.utils.formatEther(nft.creatorBidShare),
+    auctionId: Number(nft?.reserveAuctions[nft.reserveAuctions.length - 1]?.id ?? "-1"),
   };
 };
 

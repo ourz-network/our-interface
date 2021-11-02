@@ -1,6 +1,7 @@
 import React from "react";
 import { Signer } from "ethers";
 import { FullComponents, NFTFullPage } from "@zoralabs/nft-components";
+import { Router, useRouter } from "next/router";
 import DetailedPie, { ChartData } from "@/components/Charts/DetailedPie";
 import { Recipient } from "@/utils/OurzSubgraph";
 import ManageEdition from "./ManageEdition";
@@ -14,6 +15,8 @@ import Table from "@/components/Charts/Table";
 import ShareNFTE from "./ShareNFTE";
 import useEditions from "@/common/hooks/useEditions";
 import ManageUnique from "./ManageUnique";
+import PlaceBid from "./PlaceBid";
+import Button from "@/components/Button";
 
 interface SaleInfo {
   maxSupply: number;
@@ -36,6 +39,7 @@ const FullPageNFT = ({
   signer: Signer | undefined;
   isOwner: boolean;
 }): JSX.Element => {
+  const Router = useRouter();
   const { purchase } = useEditions({ post, signer, saleInfo });
 
   return (
@@ -80,8 +84,17 @@ const FullPageNFT = ({
                   {post && <Details />}
                 </div>
                 <FullComponents.AuctionInfo />
-                <div className="hidden place-self-end my-auto md:block">
-                  <FullComponents.PlaceOfferButton />
+                <div className="hidden flex-col my-auto md:flex">
+                  <div className="flex place-self-end">
+                    <p className="pr-2 my-auto">Bid on Zora Marketplace:</p>
+                    <Button
+                      text="Visit Zora"
+                      onClick={() =>
+                        Router.push(`https://zora.co/collections/zora/${post.tokenId}/auction/bid`)
+                      }
+                      isMain={false}
+                    />
+                  </div>
                 </div>
                 <div className="my-2">
                   <FullComponents.ProofAuthenticity />
@@ -89,6 +102,7 @@ const FullPageNFT = ({
               </div>
               <div className="flex flex-col space-y-2 xl:mt-0 xl:w-5/12 xl:ml-6">
                 {isOwner && <ManageUnique />}
+                <PlaceBid />
                 <FullComponents.CreatorEquity />
                 <FullComponents.BidHistory />
                 {recipients?.length > 1 && <Table recipients={recipients} />}

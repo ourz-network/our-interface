@@ -10,12 +10,14 @@ import {
 } from "@zoralabs/zdk"; // Zora provider
 import { NFTStorage } from "nft.storage";
 import { ethers, BigNumberish, Signer, Contract, providers, BigNumber, Transaction } from "ethers";
+import { CLIENT_RENEG_WINDOW } from "tls";
 import BalanceTree from "@/ethereum/merkle-tree/balance-tree"; // Creates merkle tree for splits
 import pylonJSON from "@/ethereum/abis/OurPylon.json";
 import proxyJSON from "@/ethereum/abis/OurProxy.json";
 import factoryJSON from "@/ethereum/abis/OurFactory.json";
 import editionMintableJSON from "@/ethereum/abis/SingleEditionMintable.json";
 import editionFactoryJSON from "@/ethereum/abis/SingleEditionMintableCreator.json";
+import ahJSON from "@/ethereum/abis/AuctionHouse.json";
 import { SplitRecipient } from "@/utils/OurzSubgraph";
 import { FormSplitRecipient, MintForm, ZNFTEdition } from "@/utils/CreateModule";
 import { Ourz20210928 } from "@/utils/20210928";
@@ -42,9 +44,13 @@ const initializeOurProxyAsPylonWSigner = ({
 // zora
 const editionFactoryABI = editionFactoryJSON.abi;
 const editionMintableABI = editionMintableJSON.abi;
+const ahABI = ahJSON.abi;
 
 const initializeEditionFactoryWSigner = ({ signer }: { signer: Signer }): Contract =>
   new ethers.Contract(process.env.NEXT_PUBLIC_ZEDITION_1 as string, editionFactoryABI, signer);
+
+const initializeAuctionHouseWSigner = ({ signer }: { signer: Signer }): Contract =>
+  new ethers.Contract(process.env.NEXT_PUBLIC_ZAUCTION_1 as string, ahABI, signer);
 
 const initializeEditionWSigner = ({
   signer,
@@ -549,6 +555,31 @@ export const createZoraAuction = async ({
   if (auctionReceipt) {
     const auctionId = parseInt(auctionReceipt.events[3].topics[1], 16);
     return auctionId;
+  }
+  return -1;
+};
+export const placeBidZoraAH = async ({
+  signer,
+  auctionId,
+  bidAmount,
+}: {
+  signer: Signer;
+  auctionId: number;
+  bidAmount: string;
+}): Promise<number> => {
+  const AuctionHouse = initializeAuctionHouseWSigner({ signer });
+
+  const bid: BigNumberish = ethers.utils.parseUnits(bidAmount.toString(), "ether");
+
+  const bidTx = await AuctionHouse.createBid(auctionId, bid, {
+    value: bid,
+  });
+
+  // Wait for Tx to process
+  const bidReceipt = await bidTx.wait();
+
+  if (bidReceipt) {
+    console.log(bidReceipt);
   }
   return -1;
 };

@@ -26,7 +26,9 @@ export const ZORA_MEDIA_BY_ID = (id: number): DocumentNode => gql`
       contentURI,
       metadataURI,
       creatorBidShare
-      createdAtTimestamp
+      reserveAuctions {
+        id
+      }
     }
   }
   `;
