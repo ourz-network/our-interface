@@ -22,6 +22,7 @@ export interface NFTCard {
 
 const reverseRegex = /https:\/\/(?<IPFShash>\w+).ipfs.dweb.link/g;
 const corsRegex = /ipfs:\/\/(?<IPFShash>\w+)/g;
+const tempRegex = /https:\/\/ipfs.io\/ipfs\/(?<IPFShash>\w+)/g;
 
 const sanitizeURLs = (URLs: string[]): string[] => {
   const cleanURLs: string[] = [];
@@ -29,9 +30,11 @@ const sanitizeURLs = (URLs: string[]): string[] => {
   URLs.forEach((url) => {
     if (url?.length < 2) cleanURLs.push("error");
     else if (url.match(reverseRegex)) {
-      cleanURLs.push(`https://ipfs.io/ipfs/${reverseRegex.exec(url).groups.IPFShash}`);
+      cleanURLs.push(`https://infura-ipfs.io/ipfs/${reverseRegex.exec(url).groups.IPFShash}`);
     } else if (url.match(corsRegex)) {
-      cleanURLs.push(`https://ipfs.io/ipfs/${corsRegex.exec(url).groups.IPFShash}`);
+      cleanURLs.push(`https://infura-ipfs.io/ipfs/${corsRegex.exec(url).groups.IPFShash}`);
+    } else if (url.match(tempRegex)) {
+      cleanURLs.push(`https://infura-ipfs.io/ipfs/${tempRegex.exec(url).groups.IPFShash}`);
     } else if (
       url.includes("ipfs") ||
       url.includes("fleek") ||
