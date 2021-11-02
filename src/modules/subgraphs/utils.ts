@@ -59,6 +59,8 @@ const fetchMetadata = async (metadataURI: string): Promise<Ourz20210928 | null> 
     });
     return data;
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(`Error Fetching Metadata: ${error}`);
     return null;
   }
 };

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useState } from "react";
 import { Signer } from "ethers";
 import {
@@ -68,7 +67,9 @@ const useEditions = ({
       salePrice: formData.price,
     });
     if (!success) {
+      // eslint-disable-next-line no-console
       console.log(`ERROR SETTING PRICE`);
+      // eslint-disable-next-line no-console
     } else console.log(`SUCCESSFULLY SET PRICE`);
   };
 
@@ -79,7 +80,9 @@ const useEditions = ({
       editionAddress: post.editionAddress as string,
     });
     if (!success) {
+      // eslint-disable-next-line no-console
       console.log(`ERROR WITHDRAWING FUNDS`);
+      // eslint-disable-next-line no-console
     } else console.log(`SUCCESSFULLY WITHDREW FUNDS`);
   };
 
@@ -92,7 +95,9 @@ const useEditions = ({
       approved: formData.approved,
     });
     if (!success) {
+      // eslint-disable-next-line no-console
       console.log(`ERROR SETTING MINTER`);
+      // eslint-disable-next-line no-console
     } else console.log(`SUCCESSFULLY SET MINTER`);
   };
 
@@ -104,7 +109,9 @@ const useEditions = ({
       recipients: formData.mintTo.split(","),
     });
     if (!success) {
+      // eslint-disable-next-line no-console
       console.log(`ERROR MINTING EDITIONS`);
+      // eslint-disable-next-line no-console
     } else console.log(`SUCCESSFULLY MINTED EDITIONS`);
   };
 

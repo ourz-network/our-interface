@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useEffect, useState } from "react";
 import { ethers, Signer } from "ethers";
 import { Auction, AuctionHouse } from "@zoralabs/zdk";
@@ -21,8 +20,6 @@ const useUniques = ({ post, signer }: { post: NFTCard; signer: Signer | undefine
         setMinBid(Number(ethers.utils.formatEther(auction.amount)) * 1.05);
         setBid(Number(ethers.utils.formatEther(auction.amount)) * 1.05);
       }
-      console.log(auction);
-      console.log(minBid);
       setAuctionInfo(auction);
     }
 

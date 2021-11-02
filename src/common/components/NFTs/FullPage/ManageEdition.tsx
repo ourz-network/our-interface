@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useContext } from "react";
 import { toTrimmedAddress } from "@/utils/index";
 import Button from "../../Button";

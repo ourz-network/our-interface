@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useContext } from "react";
 import web3 from "@/app/web3";
 import FullPageContext from "./FullPageContext";

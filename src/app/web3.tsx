@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import WalletConnectProvider from "@walletconnect/web3-provider"; // WalletConnectProvider (Web3Modal)
 import { BigNumber, ethers, Signer } from "ethers"; // Ethers
 import { useCallback, useEffect, useState } from "react"; // State management
@@ -97,6 +96,7 @@ function useWeb3() {
 
       setNetwork(Network);
 
+      // eslint-disable-next-line no-console
       console.log(
         `Detected Web3 Network Change...\nNow connected to ${Network?.name}, Chain #${Network?.chainId}`
       );
@@ -105,12 +105,14 @@ function useWeb3() {
     provider?.on("accountsChanged", (accounts: string[]) => {
       setAddress(accounts[0]);
 
+      // eslint-disable-next-line no-console
       console.log(`Detected Web3 Account Change...\nNow connected to signer: ${accounts[0]}`);
     });
 
     provider?.on("disconnect", (error: { code: number; message: string }) => {
       disconnectWeb3();
 
+      // eslint-disable-next-line no-console
       console.log(
         `Web3 Disconnected${
           error.message && error.code
@@ -119,7 +121,7 @@ function useWeb3() {
         }`
       );
     });
-  }, [disconnectWeb3, modal, network?.chainId, network?.name]);
+  }, [disconnectWeb3, modal]);
 
   useEffect(() => {
     if (modal?.cachedProvider) {

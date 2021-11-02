@@ -10,7 +10,6 @@ import {
 } from "@zoralabs/zdk"; // Zora provider
 import { NFTStorage } from "nft.storage";
 import { ethers, BigNumberish, Signer, Contract, providers, BigNumber, Transaction } from "ethers";
-import { CLIENT_RENEG_WINDOW } from "tls";
 import BalanceTree from "@/ethereum/merkle-tree/balance-tree"; // Creates merkle tree for splits
 import pylonJSON from "@/ethereum/abis/OurPylon.json";
 import proxyJSON from "@/ethereum/abis/OurProxy.json";
@@ -579,6 +578,7 @@ export const placeBidZoraAH = async ({
   const bidReceipt = await bidTx.wait();
 
   if (bidReceipt) {
+    // eslint-disable-next-line no-console
     console.log(bidReceipt);
   }
   return -1;
