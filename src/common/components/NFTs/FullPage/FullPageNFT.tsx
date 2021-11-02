@@ -1,7 +1,7 @@
 import React from "react";
 import { Signer } from "ethers";
 import { FullComponents, NFTFullPage } from "@zoralabs/nft-components";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import DetailedPie, { ChartData } from "@/components/Charts/DetailedPie";
 import { Recipient } from "@/utils/OurzSubgraph";
 import ManageEdition from "./ManageEdition";
