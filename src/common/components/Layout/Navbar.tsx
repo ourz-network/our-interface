@@ -65,32 +65,18 @@ const Navbar = (): JSX.Element => {
             <div className="m-auto w-5/6">
               <div className="flex relative flex-col justify-between items-center md:flex-row md:justify-start md:space-x-10">
                 <div className="flex flex-col flex-1 justify-start content-center items-center text-center md:flex-row lg:w-0 lg:flex-1">
-                  {/* <div href="#" className="mt-1 md:-mr-11 lg:pl-12">
-                    <Image
-                      height={30}
-                      width={30}
-                      alt="NFTHack"
-                      src={nfthacksmiley}
-                    />
-                  </div> */}
                   <Link href="/" passHref>
                     <a className="px-2">
                       <p className="text-2xl lg:font-semibold tracking-2-wide font-hero text-dark-primary hover:text-ourange-500">
-                        {/* "text-2xl font-bold leading-3 tracking-widest uppercase" */}
                         OURZ
                       </p>
-                      {/* <img
-                        className="w-auto h-8 sm:h-10"
-                        src=""
-                        alt="OURZ-V2"
-                      /> */}
                     </a>
                   </Link>
                   <a
-                    href="#"
-                    className="hidden self-center w-auto text-xs font-bold tracking-wide text-center capitalize md:block text-ourange-150 md:pr-8 hover:text-dark-secondary"
+                    href="https://www.notion.so/ourz/OURZ-Wiki-722c8f6bb127405991c55a82fba53a52"
+                    className="hidden text-dark-primary ml-8 my-auto self-center w-auto text-xs tracking-wide text-center capitalize md:block text-ourange-150 md:pr-8 hover:text-dark-secondary"
                   >
-                    {/* About */}
+                    About
                   </a>
                   {/* <div className="-my-2 -mr-2 md:hidden">
                     <Popover.Button className="inline-flex justify-center items-center p-2 bg-white text-dark-secondary hover:text-dark-secondary hover:bg-dark-background focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-500">
