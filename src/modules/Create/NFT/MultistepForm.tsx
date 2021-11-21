@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default */
 /* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable @next/next/no-img-element */ // next/image not necessary for upload flow
 
@@ -121,7 +122,7 @@ const NewMintMultistepForm = ({
     if (
       proxyAddress &&
       signer &&
-      network?.chainId === 1 &&
+      network?.chainId === (1 || 4 || 137) &&
       (mintForm.mintKind === "1/1" || mintForm.mintKind === "1/1 Auction")
     ) {
       // minting as Split Proxy by Owner
@@ -141,7 +142,7 @@ const NewMintMultistepForm = ({
     } else if (
       proxyAddress &&
       signer &&
-      network?.chainId === 1 &&
+      // network?.chainId === (1 || 4 || 137) &&
       mintForm.mintKind === "Edition"
     ) {
       const editionAddress = await createZoraEdition({

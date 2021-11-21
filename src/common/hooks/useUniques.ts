@@ -4,14 +4,22 @@ import { Auction, AuctionHouse } from "@zoralabs/zdk";
 import { createZoraAuction, placeBidZoraAH } from "@/modules/ethereum/OurPylon";
 import { NFTCard } from "@/modules/subgraphs/utils";
 
-const useUniques = ({ post, signer }: { post: NFTCard; signer: Signer | undefined }) => {
+const useUniques = ({
+  post,
+  signer,
+  networkId,
+}: {
+  post: NFTCard;
+  signer: Signer | undefined;
+  networkId: number;
+}) => {
   const [auctionInfo, setAuctionInfo] = useState<Auction | undefined>(undefined);
   const [bid, setBid] = useState(0);
   const [minBid, setMinBid] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     async function getAuctionInfo() {
-      const auctionHouse = new AuctionHouse(signer, 1);
+      const auctionHouse = new AuctionHouse(signer, networkId);
       const auction = await auctionHouse.fetchAuction(post.auctionId);
       if (ethers.utils.formatEther(auction.amount.toString()) === "0.0") {
         setMinBid(Number(ethers.utils.formatEther(auction.reservePrice)));
@@ -29,10 +37,15 @@ const useUniques = ({ post, signer }: { post: NFTCard; signer: Signer | undefine
         () => {}
       );
     }
-  }, [post?.auctionId, signer]);
+  }, [networkId, post.auctionId, signer]);
 
   const placeBid = async () => {
-    const success = await placeBidZoraAH({ signer, auctionId: post.auctionId, bidAmount: bid });
+    const success = await placeBidZoraAH({
+      signer,
+      auctionId: post.auctionId,
+      bidAmount: bid,
+      networkId,
+    });
   };
 
   const [formData, setFormData] = useState({
@@ -57,6 +70,7 @@ const useUniques = ({ post, signer }: { post: NFTCard; signer: Signer | undefine
   const startAuction = async () => {
     const success = await createZoraAuction({
       ...formData,
+      signer,
     });
 
     if (!success) {

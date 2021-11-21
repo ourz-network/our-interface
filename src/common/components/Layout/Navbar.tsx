@@ -4,7 +4,7 @@ import { Popover, Transition } from "@headlessui/react"; // TailwindUI
 import Link from "next/link"; // Dynamic routing
 import { Fragment } from "react"; // State management, Fragment for TailwindUI
 import web3 from "@/app/web3"; // Global State
-import Wallet from "./Wallet";
+import Wallet from "../Wallet/Wallet";
 
 /*
  * const learn = [
@@ -74,7 +74,7 @@ const Navbar = (): JSX.Element => {
                   </Link>
                   <a
                     href="https://www.notion.so/ourz/OURZ-Wiki-722c8f6bb127405991c55a82fba53a52"
-                    className="hidden text-dark-primary ml-8 my-auto self-center w-auto text-xs tracking-wide text-center capitalize md:block text-ourange-150 md:pr-8 hover:text-dark-secondary"
+                    className="hidden self-center my-auto ml-8 w-auto text-xs tracking-wide text-center capitalize text-dark-primary md:block text-ourange-150 md:pr-8 hover:text-dark-secondary"
                   >
                     About
                   </a>

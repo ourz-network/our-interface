@@ -10,7 +10,7 @@ import useSplits from "@/common/hooks/useSplits";
 
 const CreateDashboard = (): JSX.Element => {
   const { address, network } = web3.useContainer();
-  const { ownedSplits } = useSplits({ address });
+  const { ownedSplits } = useSplits({ address, network });
   const Router = useRouter();
 
   const [newSplit, setNewSplit] = useState(false);
@@ -28,9 +28,7 @@ const CreateDashboard = (): JSX.Element => {
         <NewSplit />
       ) : (
         <div className="flex flex-col w-full min-h-screen h-min bg-dark-background">
-          {network?.name !== "homestead" ? (
-            <WrongNetworkAlert />
-          ) : (
+          {network?.chainId === 1 || network?.chainId === 4 || network?.chainId === 137 ? (
             <>
               {ownedSplits ? (
                 <>
@@ -57,6 +55,8 @@ const CreateDashboard = (): JSX.Element => {
                 <Button isMain text="Create New Split" onClick={() => setNewSplit(true)} />
               </div>
             </>
+          ) : (
+            <WrongNetworkAlert />
           )}
         </div>
       )}

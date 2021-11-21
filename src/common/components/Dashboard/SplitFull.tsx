@@ -6,7 +6,7 @@ import AuctionForm from "@/components/Dashboard/AuctionForm";
 import { Split, Recipient } from "@/utils/OurzSubgraph";
 import Sidebar from "./Sidebar";
 import { NFTCard } from "@/modules/subgraphs/utils";
-import SquareGrid from "@/common/components/NFTs/SquareGrid";
+import SquareGrid from "@/common/components/NftCards/SquareGrid";
 
 const SplitFull = ({
   split,

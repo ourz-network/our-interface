@@ -5,7 +5,7 @@ import { Zora } from "@zoralabs/zdk";
 import { ethers } from "ethers";
 import PageLayout from "@/components/Layout/PageLayout";
 import { getPostByID } from "@/subgraphs/zora/functions"; // Post collection helper
-import MasonryNFT from "@/common/components/NFTs/Preview/MasonryNFT";
+import MasonryNFT from "@/common/components/NftCards/Preview/MasonryNFT";
 import { Media } from "@/utils/ZoraSubgraph";
 import { Ourz20210928 } from "@/utils/20210928";
 

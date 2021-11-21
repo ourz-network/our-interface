@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { GetStaticPaths, GetStaticProps } from "next";
 import PageLayout from "@/components/Layout/PageLayout"; // Layout wrapper
-import FullPageNFT from "@/components/NFTs/FullPage/FullPageNFT";
+import FullPageNFT from "@/common/components/NftCards/FullPage/FullPageNFT";
 import {
   getAllOurzEditions,
   getPostByEditionAddress,
@@ -10,6 +10,7 @@ import {
 } from "@/subgraphs/ourz/functions"; // GraphQL client
 import { SplitRecipient } from "@/utils/OurzSubgraph";
 import editionJSON from "@/ethereum/abis/SingleEditionMintable.json";
+import editionPolygonJSON from "@/ethereum/abis/SingleEditionMintablePolygon.json";
 import web3 from "@/app/web3";
 import { NFTCard } from "@/modules/subgraphs/utils";
 import useOwners from "@/common/hooks/useOwners";
@@ -17,6 +18,7 @@ import useRecipients from "@/common/hooks/useRecipients";
 import useEditions from "@/common/hooks/useEditions";
 
 const editionABI = editionJSON.abi;
+const editionPolygonABI = editionPolygonJSON.abi;
 
 const FullPageEdition = ({
   post,
@@ -64,26 +66,58 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const editionAddress = context.params?.editionAddress;
-  const post = await getPostByEditionAddress(editionAddress as string);
+  let post;
+  let network;
 
-  const queryProvider = ethers.providers.getDefaultProvider("homestead", {
-    infura: process.env.NEXT_PUBLIC_INFURA_ID,
-    alchemy: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    pocket: process.env.NEXT_PUBLIC_POKT_ID,
-    etherscan: process.env.NEXT_PUBLIC_ETHERSCAN_KEY,
-  });
-  const editionContract = new ethers.Contract(editionAddress as string, editionABI, queryProvider);
+  try {
+    post = await getPostByEditionAddress(editionAddress as string, 137);
+    if (post) {
+      network = 137;
+    }
+  } catch (error) {
+    post = await getPostByEditionAddress(editionAddress as string, 1);
+    if (post) {
+      network = 1;
+    }
+  }
+  const matic: Network = {
+    name: "matic",
+    chainId: 137,
+    _defaultProvider: (providers) =>
+      new providers.JsonRpcProvider(
+        `https://polygon-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
+      ),
+  };
+  let queryProvider;
+  if (network === 1) {
+    queryProvider = ethers.providers.getDefaultProvider("mainnet", {
+      infura: process.env.NEXT_PUBLIC_INFURA_ID,
+      alchemy: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+      pocket: process.env.NEXT_PUBLIC_POKT_ID,
+      etherscan: process.env.NEXT_PUBLIC_ETHERSCAN_KEY,
+    });
+  } else {
+    queryProvider = ethers.providers.getDefaultProvider(matic);
+  }
+
+  const editionContract = new ethers.Contract(
+    editionAddress as string,
+    network === 1 ? editionABI : editionPolygonABI,
+    queryProvider
+  );
 
   if (post && editionContract) {
     // subgraph query
-    const recipients = await getSplitRecipients(post.creator);
-    const splitOwners = await getSplitOwners(post.creator);
+    const recipients = await getSplitRecipients(post.creator, network);
+    const splitOwners = await getSplitOwners(post.creator, network);
 
     // blockchain query
     let totalSupply = BigNumber.from(0);
     try {
       totalSupply = await editionContract.totalSupply();
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
       // reverts if no editions have minted yet
     }
     const editionSize = await editionContract.editionSize();
@@ -94,7 +128,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       currentSupply: Number(totalSupply.toString()),
       salePrice: Number(ethers.utils.formatUnits(salePrice)),
     };
-
     return {
       props: {
         post,

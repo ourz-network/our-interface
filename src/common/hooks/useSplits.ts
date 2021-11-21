@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import {
   getOwnedSplits,
   getClaimableSplits,
@@ -9,7 +10,13 @@ import { getPostByID } from "@/modules/subgraphs/zora/functions";
 import { claimFunds } from "@/modules/ethereum/OurPylon";
 import { NFTCard } from "@/modules/subgraphs/utils";
 
-const useSplits = ({ address }: { address: string | undefined }) => {
+const useSplits = ({
+  address,
+  network,
+}: {
+  address: string | undefined;
+  network: ethers.providers.Network;
+}) => {
   // all user's splits
   const [ownedSplits, setOwnedSplits] = useState<Split[] | null>([]);
   const [claimableSplits, setClaimableSplits] = useState<Recipient[] | null>([]);
@@ -17,8 +24,10 @@ const useSplits = ({ address }: { address: string | undefined }) => {
   useEffect(() => {
     async function getAllSplits() {
       if (address) {
-        setOwnedSplits(await getOwnedSplits(address));
-        setClaimableSplits(await getClaimableSplits(address));
+        const resOwnSplits = await getOwnedSplits(address, network.chainId);
+        const resClaimSplits = await getClaimableSplits(address, network.chainId);
+        setOwnedSplits(resOwnSplits);
+        setClaimableSplits(resClaimSplits);
       }
     }
 
@@ -26,7 +35,7 @@ const useSplits = ({ address }: { address: string | undefined }) => {
       () => {},
       () => {}
     );
-  }, [address]);
+  }, [address, network]);
 
   // selected split
   const [selectedSplit, setSelectedSplit] = useState<Split | null>();
@@ -50,7 +59,7 @@ const useSplits = ({ address }: { address: string | undefined }) => {
       const Editions: (NFTCard | null)[] = [];
       await Promise.all(
         (selectedSplit as Split).editions.map(async (edition) => {
-          const post = await getPostByEditionAddress(edition.id);
+          const post = await getPostByEditionAddress(edition.id, network?.chainId);
           Editions.push(post);
         })
       );
@@ -59,7 +68,7 @@ const useSplits = ({ address }: { address: string | undefined }) => {
       const Creations: (NFTCard | null)[] = [];
       await Promise.all(
         (selectedSplit as Split).creations.map(async (creation) => {
-          const post = await getPostByID(Number(creation.id));
+          const post = await getPostByID(Number(creation.id), network?.chainId);
           Creations.push(post);
         })
       );
@@ -70,7 +79,7 @@ const useSplits = ({ address }: { address: string | undefined }) => {
       () => {},
       () => {}
     );
-  }, [selectedSplit]);
+  }, [network, selectedSplit]);
 
   const clickClaim = async () => {
     await claimFunds({

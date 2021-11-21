@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import NewMintMultistepForm from "@/Create/NFT/MultistepForm";
 import { getSplitRecipients } from "@/subgraphs/ourz/functions";
 import { SplitRecipient } from "@/utils/OurzSubgraph";
+import web3 from "@/app/web3";
 
 const MintNFTFromExistingSplit = (): JSX.Element => {
+  const { network } = web3.useContainer();
   const [loading, setLoading] = useState(true); // Global loading state
   const { query } = useRouter();
   const { proxyAddress } = query;
@@ -12,10 +14,18 @@ const MintNFTFromExistingSplit = (): JSX.Element => {
 
   useEffect(() => {
     async function collectSplitRecipients(address: string) {
-      const recipients = await getSplitRecipients(address);
-      if (recipients) {
-        setSplitRecipients(recipients);
-        setLoading(false);
+      try {
+        const recipients = await getSplitRecipients(address, network?.chainId ?? 137);
+        if (recipients) {
+          setSplitRecipients(recipients);
+          setLoading(false);
+        }
+      } catch (error) {
+        const recipients = await getSplitRecipients(address, network?.chainId ?? 1);
+        if (recipients) {
+          setSplitRecipients(recipients);
+          setLoading(false);
+        }
       }
     }
     if (proxyAddress) {
@@ -24,7 +34,7 @@ const MintNFTFromExistingSplit = (): JSX.Element => {
         () => {}
       );
     }
-  }, [proxyAddress]);
+  }, [network?.chainId, proxyAddress]);
 
   return !loading ? (
     <NewMintMultistepForm proxyAddress={proxyAddress as string} splitRecipients={splitRecipients} />

@@ -26,11 +26,99 @@ const factoryABI = factoryJSON.abi;
 const pylonABI = pylonJSON.abi;
 const proxyBytecode = proxyJSON.bytecode;
 
-const initializeOurFactoryWSigner = ({ signer }: { signer: Signer }): Contract =>
-  new ethers.Contract(process.env.NEXT_PUBLIC_FACTORY_1 as string, factoryABI, signer);
+const getOurFactoryAddress = (networkId: number): string => {
+  switch (networkId) {
+    case 1:
+      return process.env.NEXT_PUBLIC_FACTORY_1 as string;
+      break;
 
-const initializeOurPylonWSigner = ({ signer }: { signer: Signer }): Contract =>
-  new ethers.Contract(process.env.NEXT_PUBLIC_PYLON_1 as string, pylonABI, signer);
+    case 4:
+      return process.env.NEXT_PUBLIC_FACTORY_4 as string;
+      break;
+
+    case 137:
+      return process.env.NEXT_PUBLIC_FACTORY_137 as string;
+      break;
+
+    default:
+      return process.env.NEXT_PUBLIC_FACTORY_1 as string;
+  }
+};
+
+const getPylonAddress = (networkId: number): string => {
+  // process.env.NEXT_PUBLIC_PYLON
+  switch (networkId) {
+    case 1:
+      return process.env.NEXT_PUBLIC_PYLON_1 as string;
+      break;
+
+    case 4:
+      return process.env.NEXT_PUBLIC_PYLON_4 as string;
+      break;
+
+    case 137:
+      return process.env.NEXT_PUBLIC_PYLON_137 as string;
+      break;
+
+    default:
+      return process.env.NEXT_PUBLIC_PYLON_1 as string;
+      break;
+  }
+};
+const getAuctionHouseAddress = (networkId: number): string => {
+  switch (networkId) {
+    case 1:
+      return process.env.NEXT_PUBLIC_ZAUCTION_1 as string;
+      break;
+
+    case 4:
+      return process.env.NEXT_PUBLIC_ZAUCTION_4 as string;
+      break;
+
+    case 137:
+      return process.env.NEXT_PUBLIC_ZAUCTION_137 as string;
+      break;
+
+    default:
+      return process.env.NEXT_PUBLIC_ZAUCTION_1 as string;
+      break;
+  }
+};
+const getEditionFactoryAddress = (networkId: number): string => {
+  switch (networkId) {
+    case 1:
+      return process.env.NEXT_PUBLIC_ZEDITION_1 as string;
+      break;
+
+    case 4:
+      return process.env.NEXT_PUBLIC_ZEDITION_4 as string;
+      break;
+
+    case 137:
+      return process.env.NEXT_PUBLIC_ZEDITION_137 as string;
+      break;
+
+    default:
+      return process.env.NEXT_PUBLIC_ZEDITION_1 as string;
+      break;
+  }
+};
+
+const initializeOurFactoryWSigner = ({
+  signer,
+  networkId,
+}: {
+  signer: Signer;
+  networkId: number;
+}): Contract => new ethers.Contract(getOurFactoryAddress(networkId), factoryABI, signer);
+
+const initializeOurPylonWSigner = ({
+  signer,
+  networkId,
+}: {
+  signer: Signer;
+  networkId: number;
+}): Contract => new ethers.Contract(getPylonAddress(networkId), pylonABI, signer);
 
 const initializeOurProxyAsPylonWSigner = ({
   proxyAddress,
@@ -45,11 +133,21 @@ const editionFactoryABI = editionFactoryJSON.abi;
 const editionMintableABI = editionMintableJSON.abi;
 const ahABI = ahJSON.abi;
 
-const initializeEditionFactoryWSigner = ({ signer }: { signer: Signer }): Contract =>
-  new ethers.Contract(process.env.NEXT_PUBLIC_ZEDITION_1 as string, editionFactoryABI, signer);
+const initializeEditionFactoryWSigner = ({
+  signer,
+  networkId,
+}: {
+  signer: Signer;
+  networkId: number;
+}): Contract => new ethers.Contract(getEditionFactoryAddress(networkId), editionFactoryABI, signer);
 
-const initializeAuctionHouseWSigner = ({ signer }: { signer: Signer }): Contract =>
-  new ethers.Contract(process.env.NEXT_PUBLIC_ZAUCTION_1 as string, ahABI, signer);
+const initializeAuctionHouseWSigner = ({
+  signer,
+  networkId,
+}: {
+  signer: Signer;
+  networkId: number;
+}): Contract => new ethers.Contract(getAuctionHouseAddress(networkId), ahABI, signer);
 
 const initializeEditionWSigner = ({
   signer,
@@ -119,12 +217,14 @@ export const newProxy = async ({
   owners,
   formData,
   nickname,
+  networkId,
 }: {
   signer: Signer;
   address: string;
   owners?: string[];
   formData: FormSplitRecipient[];
   nickname: string;
+  networkId: number;
 }): Promise<string> => {
   /** Step 1)
    * If user defined splits other than their own royalties,
@@ -133,8 +233,8 @@ export const newProxy = async ({
   const { rootHash, splitsForMeta } = formatSplits(formData);
 
   // init contracts
-  const FACTORY_WRITE: Contract = initializeOurFactoryWSigner({ signer });
-  const PYLON_WRITE: Contract = initializeOurPylonWSigner({ signer });
+  const FACTORY_WRITE: Contract = initializeOurFactoryWSigner({ signer, networkId });
+  const PYLON_WRITE: Contract = initializeOurPylonWSigner({ signer, networkId });
 
   // get deployment data to setup owners
   let deployData: string;
@@ -340,11 +440,13 @@ export const createZoraEdition = async ({
   soloAddress,
   proxyAddress,
   mintForm,
+  networkId,
 }: {
   signer: Signer;
   soloAddress?: string;
   proxyAddress?: string;
   mintForm: MintForm;
+  networkId: number;
   // eslint-disable-next-line consistent-return
 }): Promise<number | undefined> => {
   // Upload file to IPFS
@@ -376,7 +478,7 @@ export const createZoraEdition = async ({
       return mintReceipt.events[metadata.salePrice > 0 ? 4 : 3].args[0];
     }
   } else {
-    const zora = initializeEditionFactoryWSigner({ signer });
+    const zora = initializeEditionFactoryWSigner({ signer, networkId });
     const mintTx = await zora.createEdition(
       metadata.name,
       metadata.symbol,
@@ -561,12 +663,14 @@ export const placeBidZoraAH = async ({
   signer,
   auctionId,
   bidAmount,
+  networkId,
 }: {
   signer: Signer;
   auctionId: number;
   bidAmount: string;
+  networkId: number;
 }): Promise<number> => {
-  const AuctionHouse = initializeAuctionHouseWSigner({ signer });
+  const AuctionHouse = initializeAuctionHouseWSigner({ signer, networkId });
 
   const bid: BigNumberish = ethers.utils.parseUnits(bidAmount.toString(), "ether");
 

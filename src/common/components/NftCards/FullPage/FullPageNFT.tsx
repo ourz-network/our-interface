@@ -17,6 +17,7 @@ import useEditions from "@/common/hooks/useEditions";
 import ManageUnique from "./ManageUnique";
 import PlaceBid from "./PlaceBid";
 import Button from "@/components/Button";
+import web3 from "@/app/web3";
 
 interface SaleInfo {
   maxSupply: number;
@@ -24,7 +25,7 @@ interface SaleInfo {
   salePrice: number;
 }
 
-const FullPageNFT = ({
+const FullPageNFT = function ({
   post,
   saleInfo,
   recipients,
@@ -38,10 +39,10 @@ const FullPageNFT = ({
   chartData: ChartData[] | null | undefined;
   signer: Signer | undefined;
   isOwner: boolean;
-}): JSX.Element => {
+}): JSX.Element {
   const Router = useRouter();
   const { purchase } = useEditions({ post, signer, saleInfo });
-
+  const { network } = web3.useContainer();
   return (
     <FullPageContext.Provider value={{ post, saleInfo }}>
       {post?.nftKind === "Edition" && (
@@ -76,7 +77,13 @@ const FullPageNFT = ({
       )}
       {post?.nftKind === "1/1" && (
         <NFTFullPage id={post.tokenId as string}>
-          <Cryptomedia />
+          {post.mimeType === "text/plain" ? (
+            <div className="text-center">
+              <FullComponents.MediaFull />
+            </div>
+          ) : (
+            <Cryptomedia />
+          )}
           <div className="p-6 mx-auto mb-6 max-w-11/12 xl:max-w-5/6">
             <div className="flex flex-col content-center mb-6 w-full lg:space-x-4 lg:flex-row">
               <div className="flex flex-col space-y-2 lg:w-7/12">
@@ -96,9 +103,11 @@ const FullPageNFT = ({
                     />
                   </div>
                 </div>
-                <div className="my-2">
-                  <FullComponents.ProofAuthenticity />
-                </div>
+                {network?.chainId === 1 && (
+                  <div className="my-2">
+                    <FullComponents.ProofAuthenticity />
+                  </div>
+                )}
               </div>
               <div className="flex flex-col space-y-2 xl:mt-0 xl:w-5/12 xl:ml-6">
                 {isOwner && <ManageUnique />}

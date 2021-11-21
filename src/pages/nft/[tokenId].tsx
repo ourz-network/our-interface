@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
 import { Zora } from "@zoralabs/zdk";
 import { GetStaticPaths, GetStaticProps } from "next";
+import { useEffect, useState } from "react";
 import PageLayout from "@/components/Layout/PageLayout"; // Layout wrapper
-import FullPageNFT from "@/components/NFTs/FullPage/FullPageNFT";
+import FullPageNFT from "@/common/components/NftCards/FullPage/FullPageNFT";
 import { getAllOurzTokens, getSplitOwners, getSplitRecipients } from "@/subgraphs/ourz/functions"; // GraphQL client
 import { Recipient } from "@/utils/OurzSubgraph";
 import { getPostByID } from "@/modules/subgraphs/zora/functions";
@@ -20,31 +21,56 @@ const FullPageZNFT = ({
   recipients: Recipient[];
   splitOwners: string[];
 }): JSX.Element => {
-  const { signer, address } = web3.useContainer();
+  const { signer, address, network } = web3.useContainer();
   const { isOwner } = useOwners({ address, splitOwners });
   const { firstSale } = useRecipients({ recipients, secondaryRoyalty: undefined });
+  const [altChainPost, setAltChainPost] = useState();
+
+  useEffect(() => {
+    async function getPost() {
+      const newPost = await getPostByID(Number(post.tokenId), network?.chainId);
+
+      setAltChainPost(newPost);
+    }
+    if (post?.tokenId) {
+      getPost().then(
+        () => {},
+        () => {}
+      );
+    }
+  }, [network, post?.tokenId]);
 
   return (
     <PageLayout>
       <div className="flex overflow-y-hidden flex-col w-full h-auto min-h-screen bg-dark-background">
-        <FullPageNFT
-          post={post}
-          isOwner={isOwner}
-          signer={signer}
-          chartData={firstSale}
-          recipients={recipients}
-        />
+        {altChainPost ? (
+          <FullPageNFT
+            post={altChainPost}
+            isOwner={isOwner}
+            signer={signer}
+            // chartData={firstSale}
+            // recipients={recipients}
+          />
+        ) : (
+          <FullPageNFT
+            post={post}
+            isOwner={isOwner}
+            signer={signer}
+            chartData={firstSale}
+            recipients={recipients}
+          />
+        )}
       </div>
     </PageLayout>
   );
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const ourTokens = await getAllOurzTokens();
+  const ourTokens = await getAllOurzTokens(1);
 
   const paths = [];
   if (ourTokens) {
-    for (let i = ourTokens?.length - 1; i >= 0; i -= 1) {
+    for (let i = ourTokens.length - 1; i >= 0; i -= 1) {
       paths.push({ params: { tokenId: `${ourTokens[i].id}` } });
     }
   }
@@ -54,7 +80,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const tokenId = context.params?.tokenId;
-  const post = await getPostByID(Number(tokenId));
+  const post = await getPostByID(Number(tokenId), 1);
 
   const queryProvider = ethers.providers.getDefaultProvider("homestead", {
     infura: process.env.NEXT_PUBLIC_INFURA_ID,
@@ -68,8 +94,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
   let recipients;
   let splitOwners;
   try {
-    recipients = await getSplitRecipients(creatorAddress);
-    splitOwners = await getSplitOwners(creatorAddress);
+    recipients = await getSplitRecipients(creatorAddress, 1);
+    splitOwners = await getSplitOwners(creatorAddress, 1);
   } catch (error) {
     //
   }

@@ -22,7 +22,7 @@ const Details = ({ purchase }): JSX.Element => {
             <div className="p-1 m-2 text-center">
               <p className="mb-1">
                 {saleInfo?.maxSupply > 0
-                  ? `${saleInfo?.currentSupply}/${saleInfo?.maxSupply}`
+                  ? `Max Supply: ${saleInfo?.maxSupply}`
                   : `${saleInfo?.currentSupply}/∞`}
                 <br />
                 Minted

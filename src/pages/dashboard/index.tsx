@@ -19,7 +19,7 @@ const UserDashboard = (): JSX.Element => {
     creations,
     editions,
     clickClaim,
-  } = useSplits({ address });
+  } = useSplits({ address, network });
 
   const [showFull, setShowFull] = useState(false);
 
@@ -44,8 +44,8 @@ const UserDashboard = (): JSX.Element => {
             />
           )}
 
-          {(!address || network?.name !== "homestead") && <WrongNetworkAlert />}
-          {address && network?.name === "homestead" && (
+          {address &&
+          (network?.chainId === 1 || network?.chainId === 4 || network?.chainId === 137) ? (
             <>
               {ownedSplits?.length > 0 && !showFull && (
                 <>
@@ -64,6 +64,7 @@ const UserDashboard = (): JSX.Element => {
                   </div>
                 </>
               )}
+
               {!ownedSplits && (
                 <p className={`mx-auto text-center text-dark-primary ${showFull ? `hidden` : ""}`}>
                   You will need to create a new Split first. Click Create.
@@ -93,6 +94,8 @@ const UserDashboard = (): JSX.Element => {
                 </p>
               )}
             </>
+          ) : (
+            <WrongNetworkAlert />
           )}
         </div>
       </div>

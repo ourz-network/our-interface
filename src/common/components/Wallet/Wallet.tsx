@@ -154,9 +154,17 @@ const Wallet = (): JSX.Element => {
         )}
       </Popover>
       <Button
-        text={network?.name === "homestead" ? `Create` : `Switch to Mainnet`}
+        text={
+          network?.chainId === 1 || network?.chainId === 4 || network?.chainId === 137
+            ? `Create`
+            : `Wrong Network`
+        }
         isMain
-        onClick={network?.name === "homestead" ? () => Router.push(`/create`) : () => null}
+        onClick={
+          network?.chainId === 1 || network?.chainId === 4 || network?.chainId === 137
+            ? () => Router.push(`/create`)
+            : () => null
+        }
       />
     </div>
   ) : (

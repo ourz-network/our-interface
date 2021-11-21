@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import React, { FC, useEffect } from "react"; // State management
+import React, { FC, SetStateAction, useEffect, useState } from "react"; // State management
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router"; // Page redirects (static routing)
 import { ParsedUrlQuery } from "querystring";
@@ -15,7 +15,7 @@ import { NFTCard } from "@/modules/subgraphs/utils";
 import useOwners from "@/common/hooks/useOwners";
 import PageLayout from "@/components/Layout/PageLayout";
 import ProfileHeader from "@/modules/Profile/ProfileHeader";
-import SquareGrid from "@/common/components/NFTs/SquareGrid";
+import SquareGrid from "@/common/components/NftCards/SquareGrid";
 
 interface ProfilePageProps {
   redirectUsername: string;
@@ -33,8 +33,22 @@ const ProfilePage: FC<ProfilePageProps> = ({
   posts,
 }: ProfilePageProps): JSX.Element => {
   const router = useRouter();
-  const { address } = web3.useContainer();
+  const { network, address } = web3.useContainer();
   const { isOwner } = useOwners({ address, ownerAddress: user?.ethAddress ?? usernameOrAddress });
+  const [altChainPosts, setAltChainPosts] = useState();
+
+  // if user's wallet is connected to a different chain
+  useEffect(() => {
+    async function getPosts() {
+      const ownedMedia: Media[] = await getPostsByOwner(usernameOrAddress, network?.chainId);
+      setAltChainPosts([...ownedMedia.reverse()]);
+    }
+
+    getPosts().then(
+      () => {},
+      () => {}
+    );
+  }, [network, usernameOrAddress]);
 
   useEffect(() => {
     if (redirectUsername) {
@@ -63,8 +77,12 @@ const ProfilePage: FC<ProfilePageProps> = ({
           profileDetails={profileDetails}
           isOwner={isOwner}
         />
-
-        {posts?.length > 0 ? (
+        {/* eslint-disable-next-line no-nested-ternary */}
+        {altChainPosts ? (
+          <div className="mx-auto">
+            <SquareGrid posts={altChainPosts} />
+          </div>
+        ) : posts?.length > 0 ? (
           <div className="mx-auto">
             <SquareGrid posts={posts} />
           </div>
@@ -107,7 +125,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   await connectDB();
 
   const getPosts = async (ethAddress: string) => {
-    const ownedMedia: Media[] = await getPostsByOwner(ethAddress);
+    const ownedMedia: Media[] = await getPostsByOwner(ethAddress, 1);
     // const createdMedia: Media[] = await getPostsByCreator(user.ethAddress);
     const posts = [
       ...ownedMedia.reverse(),
@@ -141,34 +159,42 @@ export const getStaticProps: GetStaticProps = async (context) => {
         revalidate: 10,
       };
     } catch (error) {
-      //
-    }
-  }
-
-  // else username
-  try {
-    const user = await UserModel.findOne({
-      username_lower: (usernameOrAddress as string).toLowerCase(),
-    }).populate("user");
-    const profileDetails: IProfile = await ProfileModel.findOne({ user: user._id });
-    const { posts } = await getPosts(user.ethAddress);
-
-    if (user && profileDetails && posts) {
+      const posts = [];
       return {
         props: {
-          linkUsername: user.username,
-          user: JSON.parse(JSON.stringify(user)) as string,
-          profileDetails: JSON.parse(JSON.stringify(profileDetails)) as string,
+          usernameOrAddress,
           posts,
         },
         revalidate: 10,
       };
     }
-  } catch (error) {
-    return {
-      notFound: true,
-    };
+  } else {
+    // else username
+    try {
+      const user = await UserModel.findOne({
+        username_lower: (usernameOrAddress as string).toLowerCase(),
+      }).populate("user");
+      const profileDetails: IProfile = await ProfileModel.findOne({ user: user._id });
+      const { posts } = await getPosts(user.ethAddress as string);
+
+      if (user && profileDetails) {
+        return {
+          props: {
+            linkUsername: user.username,
+            user: JSON.parse(JSON.stringify(user)) as string,
+            profileDetails: JSON.parse(JSON.stringify(profileDetails)) as string,
+            posts,
+          },
+          revalidate: 10,
+        };
+      }
+    } catch (error) {
+      return {
+        notFound: true,
+      };
+    }
   }
+
   return {
     notFound: true,
   };

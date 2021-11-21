@@ -52,7 +52,7 @@ const lastInitials = [
   "Z",
 ];
 
-const LandingPage = (): JSX.Element => {
+const LandingPage = function (): JSX.Element {
   const rndm = 0;
   return (
     <div>

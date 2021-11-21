@@ -66,10 +66,17 @@ const fetchMetadata = async (metadataURI: string): Promise<Ourz20210928 | null> 
 };
 
 export const formatUniquePost = async (nft: Media | null): Promise<NFTCard | null> => {
-  if (!nft) return null;
-
+  if (!nft) {
+    // eslint-disable-next-line no-console
+    console.log(`Aborted`);
+    return null;
+  }
   const cleanURLs = sanitizeURLs([`${nft.contentURI}`, `${nft.metadataURI}`]);
-  if (cleanURLs[0] === "error" && cleanURLs[1] === "error") return null;
+  if (cleanURLs[0] === "error" && cleanURLs[1] === "error") {
+    // eslint-disable-next-line no-console
+    console.log(`Aborted: URLS`);
+    return null;
+  }
 
   const metadata = await fetchMetadata(cleanURLs[1]);
 
@@ -106,7 +113,9 @@ export const formatUniquePost = async (nft: Media | null): Promise<NFTCard | nul
     mimeType: metadata.mimeType,
     contentURI: cleanURLs[0],
     royalty: ethers.utils.formatEther(nft.creatorBidShare),
-    auctionId: Number(nft?.reserveAuctions[nft.reserveAuctions.length - 1]?.id ?? "-1"),
+    auctionId: nft?.reserveAuctions
+      ? Number(nft?.reserveAuctions[nft.reserveAuctions.length - 1]?.id ?? "-1")
+      : -1,
   };
 };
 

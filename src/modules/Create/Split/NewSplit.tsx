@@ -12,7 +12,7 @@ import { newProxy } from "@/modules/ethereum/OurPylon";
 
 const NewSplit: React.FC = (): JSX.Element => {
   const Router = useRouter();
-  const { address, signer } = web3.useContainer(); // Global State
+  const { address, signer, network } = web3.useContainer(); // Global State
 
   const [ownerData, setOwnerData] = useState({
     id: undefined,
@@ -105,7 +105,8 @@ const NewSplit: React.FC = (): JSX.Element => {
       signer,
       address,
       formData: controlledFields, // received as 'splitData'
-      nickname, // received as 'splitData'
+      nickname, // received as 'splitData',
+      networkId: network?.chainId,
     });
 
     if (proxyAddress) {
