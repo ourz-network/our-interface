@@ -133,7 +133,7 @@ const Wallet = (): JSX.Element => {
         isMain
         onClick={
           network?.chainId === 1 || network?.chainId === 4 || network?.chainId === 137
-            ? () => Router.push(`/create`)
+            ? () => Router.push(`/${network?.chainId}/create`)
             : () => null
         }
       />
