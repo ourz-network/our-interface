@@ -1,12 +1,10 @@
 /* eslint-disable no-shadow */
 import Link from "next/link"; // Dynamic routing
-import { Fragment, useEffect, useState } from "react"; // State management, Fragment for TailwindUI
+import { Fragment } from "react"; // State management, Fragment for TailwindUI
 import { Popover, Transition } from "@headlessui/react"; // TailwindUI
 import { useRouter } from "next/router";
 import web3 from "@/app/web3"; // Global state
 import Button from "@/components/Button";
-import checkForProfile from "@/mongodb/utils/functions";
-import { IUser } from "@/mongodb/models/UserModel";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -15,24 +13,6 @@ function classNames(...classes) {
 const Wallet = (): JSX.Element => {
   const { address, network, authenticate, disconnectWeb3 } = web3.useContainer();
   const Router = useRouter();
-
-  const [signerProfile, setSignerProfile] = useState<IUser | undefined>(null); // Check for user on Ourz' user profile api.
-
-  useEffect(() => {
-    async function getSignerProfile(signerAddress: string) {
-      const profile = await checkForProfile({ web3Address: signerAddress });
-      if (profile !== signerProfile) {
-        setSignerProfile(profile);
-      }
-    }
-
-    if (address) {
-      getSignerProfile(address).then(
-        () => {},
-        () => {}
-      );
-    }
-  }, [address]);
 
   // logs user in then checks if they have a profile
   const authenticateWithLoading = async () => {
@@ -115,21 +95,12 @@ const Wallet = (): JSX.Element => {
                       >
                         <div className="overflow-hidden border-2 ring-1 ring-opacity-5 shadow-lg border-ourange-500 ring-ourange-500">
                           <div className="grid relative gap-4 p-4 bg-dark-background">
-                            {/* see comments above */}
-                            {signerProfile ? (
-                              <Link href={`/profile/${signerProfile.username_lower}`} passHref>
-                                <div className="p-2 w-full text-base font-medium text-right cursor-pointer p- hover:bg-dark-background text-dark-primary">
-                                  @{signerProfile.username}
-                                </div>
-                              </Link>
-                            ) : (
-                              <Link href={`/profile/${address}`} passHref>
-                                <div className="p-2 w-full text-base font-medium text-right cursor-pointer p- hover:bg-dark-background text-dark-primary">
-                                  Profile
-                                </div>
-                              </Link>
-                            )}
-                            <Link href="/dashboard" passHref>
+                            <Link href={`/${network?.chainId ?? 1}/profile/${address}`} passHref>
+                              <div className="p-2 w-full text-base font-medium text-right cursor-pointer p- hover:bg-dark-background text-dark-primary">
+                                Profile
+                              </div>
+                            </Link>
+                            <Link href={`/${network?.chainId ?? 1}/dashboard`} passHref>
                               <div className="p-2 w-full text-base font-medium text-right whitespace-nowrap cursor-pointer p- hover:bg-dark-background text-dark-primary">
                                 Manage Splits
                               </div>

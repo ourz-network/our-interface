@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import { getQueryProvider } from "@/utils/index";
 
-const queryProvider = ethers.providers.getDefaultProvider("homestead", {
-  infura: process.env.NEXT_PUBLIC_INFURA_ID,
-  alchemy: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-  pocket: process.env.NEXT_PUBLIC_POKT_ID,
-  etherscan: process.env.NEXT_PUBLIC_ETHERSCAN_KEY,
-});
+const queryProvider = getQueryProvider(1);
 
 const useENS = ({ address }: { address: string }) => {
   // all user's splits

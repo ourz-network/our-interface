@@ -5,19 +5,22 @@ import Image from "next/image"; // Dynamic routing
 import React, { useEffect, useState } from "react"; // React state management
 import { ethers } from "ethers";
 import { NFTPreview, PreviewComponents } from "@zoralabs/nft-components";
+import { useRouter } from "next/router";
 import editionJSON from "@/ethereum/abis/SingleEditionMintable.json";
 import { NFTCard } from "@/modules/subgraphs/utils";
-import { toTrimmedAddress } from "@/utils/index";
+import { getQueryProvider, toTrimmedAddress } from "@/utils/index";
 
 const NFTPreviewCard = ({ post }: { post: NFTCard }): JSX.Element => {
   const [supply, setSupply] = useState<number | undefined>(undefined);
+  const router = useRouter();
+  const networkId = Number(router.query.networkId);
 
   const MediaThumb = () => (
     <Link
       href={
         post?.editionAddress
-          ? `/nft/edition/${post.editionAddress}`
-          : `/nft/${post?.tokenId as string}`
+          ? `/${networkId ?? 1}/nft/edition/${post.editionAddress}`
+          : `/${networkId ?? 1}/nft/${post?.tokenId as string}`
       }
       passHref
     >
@@ -51,7 +54,9 @@ const NFTPreviewCard = ({ post }: { post: NFTCard }): JSX.Element => {
       ) : (
         <div className="self-end text-xs italic text-dark-primary">
           by:{` `}
-          <Link href={`/profile/${post.creator}`}>{toTrimmedAddress(post.creator)}</Link>
+          <Link href={`/${networkId ?? 1}/profile/${post.creator}`}>
+            {toTrimmedAddress(post.creator)}
+          </Link>
         </div>
       )}
     </div>
@@ -59,12 +64,7 @@ const NFTPreviewCard = ({ post }: { post: NFTCard }): JSX.Element => {
 
   useEffect(() => {
     async function getEditionSupply(): Promise<void> {
-      const queryProvider = ethers.providers.getDefaultProvider("homestead", {
-        infura: process.env.NEXT_PUBLIC_INFURA_ID,
-        alchemy: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-        pocket: process.env.NEXT_PUBLIC_POKT_ID,
-        etherscan: process.env.NEXT_PUBLIC_ETHERSCAN_KEY,
-      });
+      const queryProvider = getQueryProvider(networkId);
       const editionContract = new ethers.Contract(
         post?.editionAddress as string,
         editionJSON.abi,

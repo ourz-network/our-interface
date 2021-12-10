@@ -7,14 +7,16 @@ import { getPostByID } from "@/subgraphs/zora/functions"; // Post collection hel
 import MasonryNFT from "@/common/components/NftCards/Preview/MasonryNFT";
 import { Media } from "@/utils/ZoraSubgraph";
 import { Ourz20210928 } from "@/utils/20210928";
-import { getQueryProvider } from "../utils";
+import { getQueryProvider } from "@/utils/index";
 
 const Home = ({
   postsToSet,
   loadMoreStartIndex,
+  networkId,
 }: {
   postsToSet: Media & { metadata: Ourz20210928 }[];
   loadMoreStartIndex: number;
+  networkId: number;
 }): JSX.Element => {
   const [posts, setPosts] = useState(postsToSet); // Posts array
   const [loading, setLoading] = useState(false); // Button loading state
@@ -63,7 +65,7 @@ const Home = ({
                 {posts.map((post) => (
                   // For each Zora post, Return Post component
 
-                  <MasonryNFT key={post?.name} post={post} networkId={1} />
+                  <MasonryNFT key={post?.name} post={post} networkId={networkId} />
                 ))}
               </div>
             </div>
@@ -96,57 +98,44 @@ const Home = ({
   );
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const queryProvider = getQueryProvider(1);
-  const zoraQuery = new Zora(queryProvider, 1);
+export const getStaticPaths: GetStaticPaths = () => {
+  const paths = [{ params: { networkId: "137" } }];
+
+  return { paths, fallback: true };
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const networkId = Number(context.params?.networkId) ?? 137;
+
+  const queryProvider = getQueryProvider(networkId);
+  const zoraQuery = new Zora(queryProvider, networkId);
   const unburned = Number((await zoraQuery.fetchTotalMedia()) - 1);
 
   const maxSupply = parseInt(await zoraQuery.fetchMediaByIndex(unburned), 10);
 
   const postsToSet: Media[] = [];
 
-  if (maxSupply) {
-    const ids = [];
-    for (let i = maxSupply; i >= maxSupply - 24; i -= 1) {
-      ids.push(i);
-    }
-
-    await Promise.all(
-      ids.map(async (id) => {
-        const post = await getPostByID(id);
-        if (post != null) {
-          postsToSet.push(post);
-        }
-      })
-    ).then();
-    return {
-      props: {
-        postsToSet: JSON.parse(JSON.stringify(postsToSet)),
-        loadMoreStartIndex: maxSupply - 24,
-      },
-      revalidate: 10,
-    };
-    //   const ourzSampleTokenIDs = [
-    //     3689, 3699, 3733, 3741, 3759, 3772, 3773, 3774, 3829, 3831, 3858, 3898,
-    //   ];
-    //   await Promise.all(
-    //     ourzSampleTokenIDs.map(async (id) => {
-    //       // Collect post
-    //       const post = await getPostByID(id);
-    //       if (post != null) {
-    //         postsToSet.push(post);
-    //       }
-    //     })
-    //   ).then();
-    //   return {
-    //     props: {
-    //       postsToSet: JSON.parse(JSON.stringify(postsToSet)),
-    //       loadMoreStartIndex: 0,
-    //     },
-    //     revalidate: 10,
-    //   };
+  const ids = [];
+  for (let i = maxSupply; i >= maxSupply - 24; i -= 1) {
+    ids.push(i);
   }
-  return { notFound: true };
+
+  await Promise.all(
+    ids.map(async (id) => {
+      const post = await getPostByID(id);
+      if (post != null) {
+        postsToSet.push(post);
+      }
+    })
+  ).then();
+  return {
+    props: {
+      networkId,
+      postsToSet: JSON.parse(JSON.stringify(postsToSet)),
+      loadMoreStartIndex: maxSupply - 24,
+    },
+    revalidate: 10,
+  };
 };
 
 export default Home;

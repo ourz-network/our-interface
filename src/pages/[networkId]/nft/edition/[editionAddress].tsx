@@ -16,6 +16,7 @@ import { NFTCard } from "@/modules/subgraphs/utils";
 import useOwners from "@/common/hooks/useOwners";
 import useRecipients from "@/common/hooks/useRecipients";
 import useEditions from "@/common/hooks/useEditions";
+import { getQueryProvider } from "@/utils/index";
 
 const editionABI = editionJSON.abi;
 const editionPolygonABI = editionPolygonJSON.abi;
@@ -54,10 +55,14 @@ const FullPageEdition = ({
 export const getStaticPaths: GetStaticPaths = async () => {
   const ourEditions = await getAllOurzEditions();
 
-  const paths = [];
+  const paths = [
+    {
+      params: { networkId: "137", editionAddress: `0x75855fd6b667d43ba5a79c58d4f0648c7167d75c` },
+    },
+  ];
   if (ourEditions) {
     for (let i = ourEditions?.length - 1; i >= 0; i -= 1) {
-      paths.push({ params: { editionAddress: `${ourEditions[i].id}` } });
+      paths.push({ params: { networkId: "1", editionAddress: `${ourEditions[i].id}` } });
     }
   }
 
@@ -65,51 +70,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  const networkId = Number(context.params?.networkId);
   const editionAddress = context.params?.editionAddress;
-  let post;
-  let network;
 
-  try {
-    post = await getPostByEditionAddress(editionAddress as string, 137);
-    if (post) {
-      network = 137;
-    }
-  } catch (error) {
-    post = await getPostByEditionAddress(editionAddress as string, 1);
-    if (post) {
-      network = 1;
-    }
-  }
-  const matic: Network = {
-    name: "matic",
-    chainId: 137,
-    _defaultProvider: (providers) =>
-      new providers.JsonRpcProvider(
-        `https://polygon-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
-      ),
-  };
-  let queryProvider;
-  if (network === 1) {
-    queryProvider = ethers.providers.getDefaultProvider("mainnet", {
-      infura: process.env.NEXT_PUBLIC_INFURA_ID,
-      alchemy: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-      pocket: process.env.NEXT_PUBLIC_POKT_ID,
-      etherscan: process.env.NEXT_PUBLIC_ETHERSCAN_KEY,
-    });
-  } else {
-    queryProvider = ethers.providers.getDefaultProvider(matic);
-  }
+  const queryProvider = getQueryProvider(networkId);
+  const post = await getPostByEditionAddress(editionAddress, networkId);
 
   const editionContract = new ethers.Contract(
     editionAddress as string,
-    network === 1 ? editionABI : editionPolygonABI,
+    networkId === 1 ? editionABI : editionPolygonABI,
     queryProvider
   );
 
   if (post && editionContract) {
     // subgraph query
-    const recipients = await getSplitRecipients(post.creator, network);
-    const splitOwners = await getSplitOwners(post.creator, network);
+    const recipients = await getSplitRecipients(post.creator, networkId);
+    const splitOwners = await getSplitOwners(post.creator, networkId);
 
     // blockchain query
     let totalSupply = BigNumber.from(0);

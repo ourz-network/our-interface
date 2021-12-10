@@ -3,6 +3,7 @@
 import { Popover, Transition } from "@headlessui/react"; // TailwindUI
 import Link from "next/link"; // Dynamic routing
 import { Fragment } from "react"; // State management, Fragment for TailwindUI
+import { useRouter } from "next/router";
 import web3 from "@/app/web3"; // Global State
 import Wallet from "../Wallet/Wallet";
 
@@ -56,7 +57,10 @@ import Wallet from "../Wallet/Wallet";
  */
 
 const Navbar = (): JSX.Element => {
-  const { address } = web3.useContainer(); // Global state
+  const { address, network } = web3.useContainer(); // Global state
+  const router = useRouter();
+  const networkId = router?.query?.networkId;
+
   return (
     <div id="navContainer">
       <Popover className="flex relative z-30 items-center border-b md:pb-0 h-min md:h-16 border-dark-border bg-dark-background">
@@ -65,7 +69,7 @@ const Navbar = (): JSX.Element => {
             <div className="m-auto w-5/6">
               <div className="flex relative flex-col justify-between items-center md:flex-row md:justify-start md:space-x-10">
                 <div className="flex flex-col flex-1 justify-start content-center items-center text-center md:flex-row lg:w-0 lg:flex-1">
-                  <Link href="/" passHref>
+                  <Link href={`/${network?.chainId ?? networkId}`} passHref>
                     <a className="px-2">
                       <p className="text-2xl lg:font-semibold tracking-2-wide font-hero text-dark-primary hover:text-ourange-500">
                         OURZ
@@ -74,7 +78,7 @@ const Navbar = (): JSX.Element => {
                   </Link>
                   <a
                     href="https://www.notion.so/ourz/OURZ-Wiki-722c8f6bb127405991c55a82fba53a52"
-                    className="hidden self-center my-auto ml-8 w-auto text-xs tracking-wide text-center capitalize text-dark-primary md:block text-ourange-150 md:pr-8 hover:text-dark-secondary"
+                    className="hidden self-center my-auto ml-8 w-auto text-xs tracking-wide text-center capitalize text-dark-primary md:block md:pr-8 hover:text-dark-secondary"
                   >
                     About
                   </a>
@@ -205,7 +209,7 @@ const Navbar = (): JSX.Element => {
                     {/* If user is logged in, show link to their creations */}
                     {address && (
                       <h3>
-                        <Link href={`/profile/${address}`}>
+                        <Link href={`/${network?.chainId ?? 1}/profile/${address}`}>
                           <a className="">Your Creations</a>
                         </Link>
                       </h3>

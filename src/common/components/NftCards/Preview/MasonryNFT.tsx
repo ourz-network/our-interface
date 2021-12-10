@@ -10,7 +10,7 @@ interface NextImageOnLoad {
   naturalHeight: number;
 }
 
-const MasonryNFT = ({ post }: { post: NFTCard }): JSX.Element => {
+const MasonryNFT = ({ post, networkId }: { post: NFTCard; networkId: number }): JSX.Element => {
   const { tokenId } = post;
   const ref = useRef<HTMLVideoElement>();
 
@@ -106,7 +106,7 @@ const MasonryNFT = ({ post }: { post: NFTCard }): JSX.Element => {
         <div className="flex flex-col w-full h-full cursor-pointer">
           <Link
             href={{
-              pathname: "/nft/[tokenId]",
+              pathname: `/${networkId ?? 1}/nft/[tokenId]`,
               query: { tokenId },
             }}
             passHref
@@ -145,7 +145,7 @@ const MasonryNFT = ({ post }: { post: NFTCard }): JSX.Element => {
         <div className="flex flex-col w-full h-full xl:h-full">
           <Link
             href={{
-              pathname: "/nft/[tokenId]",
+              pathname: `/${networkId ?? 1}/nft/[tokenId]`,
               query: { tokenId },
             }}
             passHref

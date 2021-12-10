@@ -12,11 +12,13 @@ const Sidebar = ({
   userInfo,
   clickClaim,
   isOwner,
+  networkId,
 }: {
   split: Split;
   userInfo: Recipient;
   clickClaim: () => Promise<void>;
   isOwner: boolean;
+  networkId: number;
 }): JSX.Element => {
   const [recipientInfo, setRecipientInfo] = useState<Recipient[] | undefined>();
   useEffect(() => {
@@ -60,14 +62,14 @@ const Sidebar = ({
               <p className="font-bold">Owners:</p>
               {split?.owners.map((owner) => (
                 <div className="cursor-pointer hover:underline" key={owner.id}>
-                  <Link href={`/profile/${owner.id}`} passHref>
+                  <Link href={`/${networkId ?? 1}/profile/${owner.id}`} passHref>
                     {toTrimmedAddress(owner.id)}
                   </Link>
                 </div>
               ))}
               <p className="mt-2 font-bold">Creator:</p>
               <div className="cursor-pointer hover:underline" key={split.creator.id}>
-                <Link href={`/profile/${split.creator.id}`} passHref>
+                <Link href={`/${networkId ?? 1}/profile/${split.creator.id}`} passHref>
                   {toTrimmedAddress(split.creator.id)}
                 </Link>
               </div>

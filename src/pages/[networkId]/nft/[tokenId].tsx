@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import { Zora } from "@zoralabs/zdk";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
@@ -11,6 +10,7 @@ import { NFTCard } from "@/modules/subgraphs/utils";
 import web3 from "@/app/web3";
 import useOwners from "@/common/hooks/useOwners";
 import useRecipients from "@/common/hooks/useRecipients";
+import { getQueryProvider } from "@/utils/index";
 
 const FullPageZNFT = ({
   post,
@@ -71,7 +71,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const paths = [];
   if (ourTokens) {
     for (let i = ourTokens.length - 1; i >= 0; i -= 1) {
-      paths.push({ params: { tokenId: `${ourTokens[i].id}` } });
+      paths.push({ params: { networkId: "1", tokenId: `${ourTokens[i].id}` } });
     }
   }
 
@@ -79,16 +79,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  const networkId = Number(context.params?.networkId);
   const tokenId = context.params?.tokenId;
-  const post = await getPostByID(Number(tokenId), 1);
+  const post = await getPostByID(Number(tokenId), networkId);
 
-  const queryProvider = ethers.providers.getDefaultProvider("homestead", {
-    infura: process.env.NEXT_PUBLIC_INFURA_ID,
-    alchemy: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    pocket: process.env.NEXT_PUBLIC_POKT_ID,
-    etherscan: process.env.NEXT_PUBLIC_ETHERSCAN_KEY,
-  });
-  const zoraQuery = new Zora(queryProvider, 1);
+  const queryProvider = getQueryProvider(networkId);
+
+  const zoraQuery = new Zora(queryProvider, networkId);
 
   const creatorAddress = await zoraQuery.fetchCreator(tokenId as string);
   let recipients;
