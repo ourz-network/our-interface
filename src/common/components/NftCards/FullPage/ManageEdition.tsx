@@ -11,13 +11,14 @@ const ManageSection = () => {
   const {
     formData,
     handleCheckbox,
-    handleMinter,
+    handleChange,
     handleMintTo,
     handlePrice,
     setSalePrice,
     withdraw,
     setEditionMinter,
     mintEditions,
+    updateEditionMedia,
   } = useEditions({ post, saleInfo, signer });
 
   return (
@@ -73,7 +74,7 @@ const ManageSection = () => {
             id="minterAddress"
             name="minterAddress"
             value={formData.minterAddress}
-            onChange={handleMinter}
+            onChange={handleChange}
             aria-label="minter"
           />
           <div className="flex justify-between pt-4 space-x-3">
@@ -140,6 +141,36 @@ const ManageSection = () => {
           />
           <div className="pt-2 mx-auto">
             <Button text="Mint To Recipients" isMain={false} onClick={() => mintEditions()} />
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-around">
+        <div className="flex flex-col place-content-evenly p-4 space-y-2 w-full text-center border border-dark-border">
+          <p className="font-semibold">Change Content</p>
+          <p>Change the Image and Animation URLs.</p>
+
+          <input
+            className="visible mb-8 outline-none bg-dark-background focus:outline-none focus:border-dark-secondary focus:ring-transparent"
+            type="text"
+            placeholder="Image URL"
+            id="newImageURI"
+            name="newImageURI"
+            value={formData.newImageURI}
+            onChange={handleChange}
+            aria-label="newImageURI"
+          />
+          <input
+            className="visible mb-8 outline-none bg-dark-background focus:outline-none focus:border-dark-secondary focus:ring-transparent"
+            type="text"
+            placeholder="Animation URL"
+            id="newAnimationURI"
+            name="newAnimationURI"
+            value={formData.newAnimationURI}
+            onChange={handleChange}
+            aria-label="newAnimationURI"
+          />
+          <div className="pt-2 mx-auto">
+            <Button text="Update Media" isMain={false} onClick={() => updateEditionMedia()} />
           </div>
         </div>
       </div>

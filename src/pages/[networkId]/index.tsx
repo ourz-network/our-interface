@@ -75,7 +75,8 @@ const Home = ({
                 onClick={() => collectMore()}
                 disabled={loading}
                 className={`w-auto mx-auto my-12 text-center transition-opacity px-3 py-1 mainButton border border-dark-border text-dark-primary${
-                  loading ? `animate-pulse text-dark-primary` : ""}`}
+                  loading ? `animate-pulse text-dark-primary` : ""
+                }`}
                 type="button"
               >
                 {loading ? "Loading..." : "Load More"}

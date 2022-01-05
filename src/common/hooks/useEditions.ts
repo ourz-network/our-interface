@@ -6,6 +6,7 @@ import {
   setApprovedMinter,
   mintEditionsToRecipients,
   purchaseEdition,
+  updateEditionURIs,
 } from "@/modules/ethereum/OurPylon";
 import { NFTCard } from "@/modules/subgraphs/utils";
 
@@ -29,6 +30,8 @@ const useEditions = ({
     approved: false,
     mintTo: "",
     price: "0",
+    newImageURI: "",
+    newAnimationURI: "",
   });
 
   const handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +41,7 @@ const useEditions = ({
     }));
   };
 
-  const handleMinter = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({
       ...prevState,
       [event.target.name]: event.target.value,
@@ -101,6 +104,21 @@ const useEditions = ({
     } else console.log(`SUCCESSFULLY SET MINTER`);
   };
 
+  const updateEditionMedia = async () => {
+    const success = await updateEditionURIs({
+      signer: signer as Signer,
+      proxyAddress: post.creator,
+      editionAddress: post.editionAddress as string,
+      imageURI: formData.newImageURI,
+      animationURI: formData.newAnimationURI,
+    });
+    if (!success) {
+      // eslint-disable-next-line no-console
+      console.log(`ERROR UPDATING MEDIA`);
+      // eslint-disable-next-line no-console
+    } else console.log(`SUCCESSFULLY UPDATED MEDIA`);
+  };
+
   const mintEditions = async () => {
     const success = await mintEditionsToRecipients({
       signer: signer as Signer,
@@ -131,7 +149,7 @@ const useEditions = ({
   return {
     formData,
     handleCheckbox,
-    handleMinter,
+    handleChange,
     handleMintTo,
     handlePrice,
     setSalePrice,
@@ -139,6 +157,7 @@ const useEditions = ({
     setEditionMinter,
     mintEditions,
     purchase,
+    updateEditionMedia,
   };
 };
 

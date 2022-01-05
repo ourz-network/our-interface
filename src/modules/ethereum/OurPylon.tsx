@@ -607,6 +607,27 @@ export const mintEditionsToRecipients = async ({
   }
   return false;
 };
+export const updateEditionURIs = async ({
+  signer,
+  proxyAddress,
+  editionAddress,
+  imageURI,
+  animationURI,
+}: {
+  signer: Signer;
+  proxyAddress: string;
+  editionAddress: string;
+  imageURI: string;
+  animationURI: string;
+}): Promise<boolean> => {
+  const PROXY_WRITE = initializeOurProxyAsPylonWSigner({ proxyAddress, signer });
+  const tx = await PROXY_WRITE.updateEditionURLs(editionAddress, imageURI, animationURI);
+  const txReceipt = await tx.wait();
+  if (txReceipt?.events[0] && txReceipt?.status === 1) {
+    return true;
+  }
+  return false;
+};
 
 export const createZoraAuction = async ({
   signer,
