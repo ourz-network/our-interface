@@ -3,7 +3,11 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import PageLayout from "@/components/Layout/PageLayout"; // Layout wrapper
 import FullPageNFT from "@/common/components/NftCards/FullPage/FullPageNFT";
-import { getAllOurzTokens, getSplitOwners, getSplitRecipients } from "@/subgraphs/ourz/functions"; // GraphQL client
+import {
+  getAllOurzTokens,
+  getSplitOwners,
+  getSplitRecipients,
+} from "@/subgraphs/ourz/functions"; // GraphQL client
 import { Recipient } from "@/utils/OurzSubgraph";
 import { getPostByID } from "@/modules/subgraphs/zora/functions";
 import { NFTCard } from "@/modules/subgraphs/utils";
@@ -23,22 +27,25 @@ const FullPageZNFT = ({
 }): JSX.Element => {
   const { signer, address, network } = web3.useContainer();
   const { isOwner } = useOwners({ address, splitOwners });
-  const { firstSale } = useRecipients({ recipients, secondaryRoyalty: undefined });
+  const { firstSale } = useRecipients({
+    recipients,
+    secondaryRoyalty: undefined,
+  });
   const [altChainPost, setAltChainPost] = useState();
 
-  useEffect(() => {
-    async function getPost() {
-      const newPost = await getPostByID(Number(post.tokenId), network?.chainId);
+  // useEffect(() => {
+  //   async function getPost() {
+  //     const newPost = await getPostByID(Number(post.tokenId), network?.chainId);
 
-      setAltChainPost(newPost);
-    }
-    if (post?.tokenId) {
-      getPost().then(
-        () => {},
-        () => {}
-      );
-    }
-  }, [network, post?.tokenId]);
+  //     setAltChainPost(newPost);
+  //   }
+  //   if (post?.tokenId) {
+  //     getPost().then(
+  //       () => {},
+  //       () => {}
+  //     );
+  //   }
+  // }, [network, post?.tokenId]);
 
   return (
     <PageLayout>
