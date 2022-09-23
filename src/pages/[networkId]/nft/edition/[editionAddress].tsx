@@ -28,13 +28,21 @@ const FullPageEdition = ({
   splitOwners,
 }: {
   post: NFTCard;
-  saleInfo: { maxSupply: number; currentSupply: number; salePrice: number; whitelistOnly: boolean };
+  saleInfo: {
+    maxSupply: number;
+    currentSupply: number;
+    salePrice: number;
+    whitelistOnly: boolean;
+  };
   recipients: SplitRecipient[];
   splitOwners: string[];
 }): JSX.Element => {
   const { signer, address } = web3.useContainer();
   const { isOwner } = useOwners({ address, splitOwners });
-  const { firstSale } = useRecipients({ recipients, secondaryRoyalty: undefined });
+  const { firstSale } = useRecipients({
+    recipients,
+    secondaryRoyalty: undefined,
+  });
 
   return (
     <PageLayout>
@@ -54,18 +62,21 @@ const FullPageEdition = ({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const ourEditions = await getAllOurzEditions();
-
   const paths = [
-    {
-      params: { networkId: "137", editionAddress: `0x75855fd6b667d43ba5a79c58d4f0648c7167d75c` },
-    },
+    // {
+    //   params: {
+    //     networkId: "137",
+    //     editionAddress: `0x75855fd6b667d43ba5a79c58d4f0648c7167d75c`,
+    //   },
+    // },
   ];
   if (ourEditions) {
     for (let i = ourEditions?.length - 1; i >= 0; i -= 1) {
-      paths.push({ params: { networkId: "1", editionAddress: `${ourEditions[i].id}` } });
+      paths.push({
+        params: { networkId: "1", editionAddress: `${ourEditions[i].id}` },
+      });
     }
   }
-
   return { paths, fallback: true };
 };
 
